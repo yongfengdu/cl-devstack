@@ -43,6 +43,12 @@ elif is_suse; then
     APACHE_NAME=apache2
     APACHE_CONF_DIR=${APACHE_CONF_DIR:-/etc/$APACHE_NAME/vhosts.d}
     APACHE_SETTINGS_DIR=${APACHE_SETTINGS_DIR:-/etc/$APACHE_NAME/conf.d}
+else
+    APACHE_NAME=httpd
+    APACHE_CONF_DIR=/usr/share/defaults/httpd/conf.d
+    APACHE_SETTINGS_DIR=/usr/share/defaults/httpd/conf.d
+    # APACHE_CONF_DIR=${APACHE_CONF_DIR:-/etc/$APACHE_NAME/conf.d}
+    # APACHE_SETTINGS_DIR=${APACHE_SETTINGS_DIR:-/etc/$APACHE_NAME/conf.d}
 fi
 APACHE_LOG_DIR="/var/log/${APACHE_NAME}"
 
@@ -69,7 +75,8 @@ function enable_apache_mod {
         # pass
         true
     else
-        exit_distro_not_supported "apache enable mod"
+	    true
+       # exit_distro_not_supported "apache enable mod"
     fi
 }
 
@@ -77,7 +84,7 @@ function enable_apache_mod {
 # to 2.0.6+ to get a working mod_proxy_uwsgi. We can probably build a
 # check for that and do it differently for different platforms.
 function install_apache_uwsgi {
-    local apxs="apxs2"
+    local apxs="apxs"
     if is_fedora; then
         apxs="apxs"
     fi
@@ -111,6 +118,13 @@ function install_apache_uwsgi {
         # redhat is missing a nice way to turn on/off modules
         echo "LoadModule proxy_uwsgi_module modules/mod_proxy_uwsgi.so" \
             | sudo tee /etc/httpd/conf.modules.d/02-proxy-uwsgi.conf
+    else 
+        echo "LoadModule proxy_uwsgi_module lib/httpd/modules/mod_proxy_uwsgi.so" \
+            | sudo tee /usr/share/defaults/httpd/conf.modules.d/02-proxy-uwsgi.conf
+        echo "LoadModule proxy_module lib/httpd/modules/mod_proxy.so" \
+            | sudo tee -a /usr/share/defaults/httpd/conf.modules.d/02-proxy-uwsgi.conf
+        echo "LoadModule proxy_http_module lib/httpd/modules/mod_proxy_http.so" \
+            | sudo tee -a /usr/share/defaults/httpd/conf.modules.d/02-proxy-uwsgi.conf
     fi
     restart_apache_server
 }
@@ -140,7 +154,13 @@ function install_apache_wsgi {
     elif is_suse; then
         install_package apache2 apache2-mod_wsgi
     else
-        exit_distro_not_supported "apache wsgi installation"
+        install_package httpd mod_wsgi
+        # For consistency with Ubuntu, switch to the worker mpm, as
+        # the default is event
+        #sudo sed -i '/mod_mpm_prefork.so/s/^/#/g' /usr/share/defaults/httpd/conf.modules.d/00-mpm.conf
+        #sudo sed -i '/mod_mpm_event.so/s/^/#/g' /usr/share/defaults/httpd/conf.modules.d/00-mpm.conf
+        #sudo sed -i '/mod_mpm_worker.so/s/^#//g' /usr/share/defaults/httpd/conf.modules.d/00-mpm.conf
+        # exit_distro_not_supported "apache wsgi installation"
     fi
     # WSGI isn't enabled by default, enable it
     enable_apache_mod wsgi
@@ -177,6 +197,14 @@ function apache_site_config_for {
         else
             echo ${enabled_site_file}.disabled
         fi
+    else
+        local enabled_site_file="$APACHE_CONF_DIR/${site}.conf"
+        if [ -f $enabled_site_file ]; then
+            echo ${enabled_site_file}
+        else
+            echo ${enabled_site_file}.disabled
+        fi
+
     fi
 }
 
@@ -193,6 +221,12 @@ function enable_apache_site {
         if [[ -f ${enabled_site_file}.disabled ]] && [[ ! -f ${enabled_site_file} ]]; then
             sudo mv ${enabled_site_file}.disabled ${enabled_site_file}
         fi
+    else
+        local enabled_site_file="$APACHE_CONF_DIR/${site}.conf"
+        # Do nothing if site already enabled or no site config exists
+        if [[ -f ${enabled_site_file}.disabled ]] && [[ ! -f ${enabled_site_file} ]]; then
+            sudo mv ${enabled_site_file}.disabled ${enabled_site_file}
+        fi
     fi
 }
 
@@ -202,6 +236,12 @@ function disable_apache_site {
     if is_ubuntu; then
         sudo a2dissite ${site} || true
     elif is_fedora || is_suse; then
+        local enabled_site_file="$APACHE_CONF_DIR/${site}.conf"
+        # Do nothing if no site config exists
+        if [[ -f ${enabled_site_file} ]]; then
+            sudo mv ${enabled_site_file} ${enabled_site_file}.disabled
+        fi
+    else
         local enabled_site_file="$APACHE_CONF_DIR/${site}.conf"
         # Do nothing if no site config exists
         if [[ -f ${enabled_site_file} ]]; then

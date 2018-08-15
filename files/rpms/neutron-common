@@ -1,14 +1,14 @@
 acl
-dnsmasq # for q-dhcp
-dnsmasq-utils # for dhcp_release
+#dnsmasq # for q-dhcp
+#dnsmasq-utils # for dhcp_release
 ebtables
-haproxy # to serve as metadata proxy inside router/dhcp namespaces
+# haproxy # to serve as metadata proxy inside router/dhcp namespaces
 iptables
 iputils
-mysql-devel
-mysql-server # NOPRIME
+#mysql-devel
+#mysql-server # NOPRIME
 openvswitch # NOPRIME
 rabbitmq-server # NOPRIME
-radvd # NOPRIME
-sqlite
+#radvd # NOPRIME
+#sqlite
 sudo

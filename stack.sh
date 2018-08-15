@@ -221,7 +221,7 @@ write_devstack_version
 
 # Warn users who aren't on an explicitly supported distro, but allow them to
 # override check and attempt installation with ``FORCE=yes ./stack``
-if [[ ! ${DISTRO} =~ (xenial|artful|bionic|stretch|jessie|f27|f28|opensuse-42.3|opensuse-tumbleweed|rhel7) ]]; then
+if [[ ! ${DISTRO} =~ (xenial|artful|bionic|stretch|jessie|f27|f28|opensuse-42.3|opensuse-tumbleweed|rhel7|clearlinux) ]]; then
     echo "WARNING: this script has not been tested on $DISTRO"
     if [[ "$FORCE" != "yes" ]]; then
         die $LINENO "If you wish to run this script anyway run with FORCE=yes"
@@ -757,7 +757,8 @@ source $TOP_DIR/tools/install_prereqs.sh
 
 # Configure an appropriate Python environment
 if [[ "$OFFLINE" != "True" ]]; then
-    PYPI_ALTERNATIVE_URL=${PYPI_ALTERNATIVE_URL:-""} $TOP_DIR/tools/install_pip.sh
+  #  PYPI_ALTERNATIVE_URL=${PYPI_ALTERNATIVE_URL:-""} $TOP_DIR/tools/install_pip.sh
+echo_summary "Comment out"
 fi
 
 # Install subunit for the subunit output stream
@@ -1431,6 +1432,9 @@ fi
 # ===============
 
 # Prepare bash completion for OSC
+if [[ ! -d /etc/bash_completion.d ]]; then
+    sudo mkdir /etc/bash_completion.d
+fi
 openstack complete | sudo tee /etc/bash_completion.d/osc.bash_completion > /dev/null
 
 # If cinder is configured, set global_filter for PV devices

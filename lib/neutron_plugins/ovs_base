@@ -81,6 +81,10 @@ function _neutron_ovs_base_install_agent_packages {
                 systemctl status openvswitch
             }
         fi
+    else
+	# clearlinux
+        sudo systemctl enable openvswitch
+        restart_service openvswitch
     fi
 }
 

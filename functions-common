@@ -316,7 +316,7 @@ function _ensure_lsb_release {
     if [[ -x $(command -v lsb_release 2>/dev/null) ]]; then
         return
     fi
-
+return
     if [[ -x $(command -v apt-get 2>/dev/null) ]]; then
         sudo apt-get install -y lsb-release
     elif [[ -x $(command -v zypper 2>/dev/null) ]]; then
@@ -409,7 +409,8 @@ function GetDistro {
         # is really about making sure it matches correctly in these
         # functions.  Then you can choose a sensible way to construct
         # DISTRO based on your distros release approach.
-        die $LINENO "Unable to determine DISTRO, can not continue."
+DISTRO="clearlinux"       
+# die $LINENO "Unable to determine DISTRO, can not continue."
     fi
     typeset -xr DISTRO
 }
@@ -1028,7 +1029,9 @@ function _get_package_dir {
     elif is_suse; then
         pkg_dir=$base_dir/rpms-suse
     else
-        exit_distro_not_supported "list of packages"
+
+        pkg_dir=$base_dir/rpms
+       # exit_distro_not_supported "list of packages"
     fi
     echo "$pkg_dir"
 }
@@ -1271,7 +1274,9 @@ function real_install_package {
     elif is_suse; then
         zypper_install "$@"
     else
-        exit_distro_not_supported "installing packages"
+
+	yum_install "$@"
+	#exit_distro_not_supported "installing packages"
     fi
 }
 

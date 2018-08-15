@@ -15,7 +15,7 @@ MYSQL_DRIVER=${MYSQL_DRIVER:-PyMySQL}
 
 register_database mysql
 
-MYSQL_SERVICE_NAME=mysql
+MYSQL_SERVICE_NAME=mariadb
 if is_fedora && ! is_oraclelinux; then
     MYSQL_SERVICE_NAME=mariadb
 fi
@@ -72,7 +72,8 @@ function configure_database_mysql {
             inicomment -sudo "$cracklib_conf" "mariadb" "plugin-load-add"
         fi
     else
-        exit_distro_not_supported "mysql configuration"
+        my_conf=/usr/share/defaults/mariadb/my.cnf
+        # exit_distro_not_supported "mysql configuration"
     fi
 
     # Start mysql-server
@@ -155,7 +156,9 @@ EOF
     elif is_ubuntu; then
         install_package mysql-server
     else
-        exit_distro_not_supported "mysql installation"
+        install_package mariadb-server
+        sudo systemctl enable mariadb
+        #exit_distro_not_supported "mysql installation"
     fi
 }
 

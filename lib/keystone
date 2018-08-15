@@ -537,7 +537,7 @@ function start_keystone {
     fi
 
     # (re)start memcached to make sure we have a clean memcache.
-    restart_service memcached
+    # restart_service memcached
 }
 
 # stop_keystone() - Stop running processes

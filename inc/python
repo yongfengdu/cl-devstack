@@ -56,7 +56,7 @@ function get_python_exec_prefix {
     elif is_fedora || is_suse; then
         echo "/usr/bin"
     else
-        echo "/usr/local/bin"
+        echo "/usr/bin"
     fi
 }
 

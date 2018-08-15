@@ -229,7 +229,7 @@ function fixup_fedora {
 
 function fixup_virtualenv {
     if [[ ! -f /etc/ci/mirror_info.sh ]]; then
-        install_package python-virtualenv
+       # install_package python-virtualenv
         pip_install -U --force-reinstall virtualenv
     fi
 }
