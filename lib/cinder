@@ -165,7 +165,7 @@ function cleanup_cinder {
             if is_ubuntu; then
                 restart_service tgt
             else
-                restart_service tgtd
+                echo "Skip restart_service tgtd"
             fi
             targets=$(sudo tgtadm --op show --mode target)
         fi
@@ -181,7 +181,7 @@ function cleanup_cinder {
         if is_ubuntu; then
             stop_service tgt
         else
-            stop_service tgtd
+            echo "stop_service tgtd"
         fi
     else
         sudo cinder-rtstool get-targets | sudo xargs -rn 1 cinder-rtstool delete
@@ -443,7 +443,8 @@ function install_cinder {
     git_clone $CINDER_REPO $CINDER_DIR $CINDER_BRANCH
     setup_develop $CINDER_DIR
     if [[ "$CINDER_ISCSI_HELPER" == "tgtadm" ]]; then
-        install_package tgt
+        # install_package tgt
+	echo "Already tgt installed manually"
     elif [[ "$CINDER_ISCSI_HELPER" == "lioadm" ]]; then
         install_package targetcli
     fi
@@ -495,7 +496,7 @@ function start_cinder {
                 stop_service tgtd
                 start_service tgtd
             else
-                restart_service tgtd
+                echo "Skip restart_service tgtd"
             fi
             # NOTE(gfidente): ensure tgtd is running in debug mode
             sudo tgtadm --mode system --op update --name debug --value on

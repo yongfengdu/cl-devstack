@@ -132,6 +132,7 @@ EOF
         if ! sudo grep -q "^auth_unix_ro=\"none\"" /etc/libvirt/libvirtd.conf; then
 	    echo "auth_unix_ro = \"none\"" | sudo tee -a /etc/libvirt/libvirtd.conf
 	    echo "auth_unix_rw = \"none\"" | sudo tee -a /etc/libvirt/libvirtd.conf
+	fi
     fi
 
     # The user that nova runs as needs to be member of **libvirtd** group otherwise
