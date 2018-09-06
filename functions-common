@@ -316,7 +316,9 @@ function _ensure_lsb_release {
     if [[ -x $(command -v lsb_release 2>/dev/null) ]]; then
         return
     fi
-return
+    if grep "Clear Linux" /lib/os-release > /dev/null; then
+	return
+    fi
     if [[ -x $(command -v apt-get 2>/dev/null) ]]; then
         sudo apt-get install -y lsb-release
     elif [[ -x $(command -v zypper 2>/dev/null) ]]; then
@@ -340,10 +342,18 @@ return
 function GetOSVersion {
     # We only support distros that provide a sane lsb_release
     _ensure_lsb_release
-
-    os_RELEASE=$(lsb_release -r -s)
-    os_CODENAME=$(lsb_release -c -s)
-    os_VENDOR=$(lsb_release -i -s)
+    if [[ -x $(command -v lsb_release 2>/dev/null) ]]; then
+        os_RELEASE=$(lsb_release -r -s)
+        os_CODENAME=$(lsb_release -c -s)
+        os_VENDOR=$(lsb_release -i -s)
+    else 
+	# ClearLinux doesn't have lsb_release support now, use info from
+	# /usr/lib/os-release or hardcoded
+        os_RELEASE="clr"
+        os_CODENAME="clr"
+        os_VENDOR="ClearLinux"
+        os_PACKAGE="rpm"
+    fi
 
     if [[ $os_VENDOR =~ (Debian|Ubuntu|LinuxMint) ]]; then
         os_PACKAGE="deb"
@@ -389,6 +399,8 @@ function GetDistro {
         DISTRO="rhel${os_RELEASE::1}"
     elif [[ "$os_VENDOR" =~ (XenServer) ]]; then
         DISTRO="xs${os_RELEASE%.*}"
+    elif [[ "$os_VENDOR" =~ (ClearLinux) ]]; then
+        DISTRO="clearlinux"
     else
         # We can't make a good choice here.  Setting a sensible DISTRO
         # is part of the problem, but not the major issue -- we really
@@ -409,8 +421,7 @@ function GetDistro {
         # is really about making sure it matches correctly in these
         # functions.  Then you can choose a sensible way to construct
         # DISTRO based on your distros release approach.
-DISTRO="clearlinux"       
-# die $LINENO "Unable to determine DISTRO, can not continue."
+        die $LINENO "Unable to determine DISTRO, can not continue."
     fi
     typeset -xr DISTRO
 }
@@ -432,6 +443,13 @@ function is_oraclelinux {
 }
 
 
+function is_clear {
+    if [[ -z "$os_VENDOR" ]]; then
+        GetOSVersion
+    fi
+
+    [ "$os_VENDOR" = "ClearLinux" ]
+}
 # Determine if current distribution is a Fedora-based distribution
 # (Fedora, RHEL, CentOS, etc).
 # is_fedora
@@ -1028,10 +1046,11 @@ function _get_package_dir {
         pkg_dir=$base_dir/rpms
     elif is_suse; then
         pkg_dir=$base_dir/rpms-suse
+    elif is_clear; then
+        pkg_dir=$base_dir/rpms-clear
     else
 
-        pkg_dir=$base_dir/rpms
-       # exit_distro_not_supported "list of packages"
+        exit_distro_not_supported "list of packages"
     fi
     echo "$pkg_dir"
 }
@@ -1273,10 +1292,10 @@ function real_install_package {
         yum_install "$@"
     elif is_suse; then
         zypper_install "$@"
+    elif is_clear; then
+        yum_install "$@"
     else
-
-	yum_install "$@"
-	#exit_distro_not_supported "installing packages"
+	exit_distro_not_supported "installing packages"
     fi
 }
 
@@ -1314,7 +1333,7 @@ function is_package_installed {
 function uninstall_package {
     if is_ubuntu; then
         apt_get purge "$@"
-    elif is_fedora; then
+    elif is_fedora || is_clear; then
         sudo ${YUM:-yum} remove -y "$@" ||:
     elif is_suse; then
         sudo zypper remove -y "$@" ||:

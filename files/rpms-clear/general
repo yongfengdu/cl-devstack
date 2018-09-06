@@ -1,0 +1,39 @@
+bc
+bridge-utils
+curl
+dbus
+gcc
+#gcc-c++
+gettext  # used for compiling message catalogs
+git
+graphviz # needed only for docs
+httpd
+httpd-dev
+iptables  # NOPRIME f25,f26,f27,f28
+# java-1.7.0-openjdk-headless  # NOPRIME rhel7
+# java-1.8.0-openjdk-headless  # NOPRIME f25,f26,f27,f28
+libffi-dev
+libjpeg-turbo-dev # Pillow 3.0.0
+libxml2-dev # lxml
+libxslt-dev # lxml
+yaml-dev
+mariadb-dev  # MySQL-python
+net-tools
+openssh
+openssl
+openssl-dev # to rebuild pyOpenSSL if needed
+pcre-dev # for python-pcre
+pkg-config
+postgresql-dev  # psycopg2
+psmisc
+pyOpenSSL # version in pip uses too much memory
+python-dev
+clr-rpm-config
+systemd-dev # for systemd-python
+tar
+tcpdump
+unzip
+util-linux
+wget
+which
+zlib-dev

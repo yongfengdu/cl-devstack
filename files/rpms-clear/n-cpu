@@ -1,0 +1,9 @@
+cryptsetup
+dosfstools
+#genisoimage
+open-iscsi
+libosinfo
+LVM2
+sg3_utils
+# Stuff for diablo volumes
+sysfsutils

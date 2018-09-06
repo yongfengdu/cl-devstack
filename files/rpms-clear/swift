@@ -1,0 +1,7 @@
+curl
+liberasurecode-dev
+memcached
+pyxattr
+rsync # dist:f25,f26,f27,f28
+sqlite-autoconf
+xfsprogs

@@ -364,6 +364,8 @@ sudo mkdir -p $DATA_DIR
 safe_chown -R $STACK_USER $DATA_DIR
 safe_chmod 0755 $DATA_DIR
 
+# ClearLinux doesn't have /etc/hosts, how to handle this? Rabbitmq
+# 
 # Configure proper hostname
 # Certain services such as rabbitmq require that the local hostname resolves
 # correctly.  Make sure it exists in /etc/hosts so that is always true.
@@ -757,8 +759,8 @@ source $TOP_DIR/tools/install_prereqs.sh
 
 # Configure an appropriate Python environment
 if [[ "$OFFLINE" != "True" ]]; then
-  #  PYPI_ALTERNATIVE_URL=${PYPI_ALTERNATIVE_URL:-""} $TOP_DIR/tools/install_pip.sh
-echo_summary "Comment out"
+    PYPI_ALTERNATIVE_URL=${PYPI_ALTERNATIVE_URL:-""} $TOP_DIR/tools/install_pip.sh
+  #echo_summary "Comment out"
 fi
 
 # Install subunit for the subunit output stream

@@ -82,9 +82,9 @@ function install_libvirt {
         install_package libvirt libvirt-devel
         pip_uninstall libvirt-python
         pip_install_gr libvirt-python
-    else 
+    elif is_clear; then
 	# clearlinux
-	install_package libvirt libvirt-bin libvirt-dev libvirt-config
+	install_package libvirt libvirt-dev
         pip_uninstall libvirt-python
         pip_install_gr libvirt-python
     fi
@@ -97,6 +97,7 @@ function install_libvirt {
 # Configures the installed libvirt system so that is accessible by
 # STACK_USER via qemu:///system with management capabilities.
 function configure_libvirt {
+    sudo mkdir -p /etc/libvirt
     if is_service_enabled neutron && ! sudo grep -q '^cgroup_device_acl' $QEMU_CONF; then
         # Add /dev/net/tun to cgroup_device_acls, needed for type=ethernet interfaces
         cat <<EOF | sudo tee -a $QEMU_CONF

@@ -419,7 +419,7 @@ function install_neutron_new {
 
     # L3 service requires radvd
     if is_service_enabled neutron-l3; then
-	echo ""
+	    echo "!!!!Clear don't have radvd(IPv6 required package)"
       #  install_package radvd
     fi
 

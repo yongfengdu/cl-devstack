@@ -817,7 +817,7 @@ WORKER_TIMEOUT=${WORKER_TIMEOUT:-90}
 # Choose DNF on RedHat/Fedora platforms with it, or otherwise default
 # to YUM.  Can remove this when only dnf is supported (i.e. centos7
 # disappears)
-if [[ -e /usr/bin/dnf ]]; then
+if [[ -e /usr/bin/dnf && ! is_clear ]]; then
     YUM=${YUM:-dnf}
 else
     YUM=${YUM:-yum}
