@@ -17,6 +17,7 @@
 # Note that if ``localrc`` is present it will be used in favor of this section.
 [[local|localrc]]
 
+USE_PYTHON3=True
 # Minimal Contents
 # ----------------
 IPV4_ADDRS_SAFE_TO_USE=192.168.100.0/24
