@@ -17,15 +17,16 @@
 # Note that if ``localrc`` is present it will be used in favor of this section.
 [[local|localrc]]
 
-USE_PYTHON3=True
 # Minimal Contents
 # ----------------
 IPV4_ADDRS_SAFE_TO_USE=192.168.100.0/24
 # While ``stack.sh`` is happy to run without ``localrc``, devlife is better when
-# there are a few minimal variables set:
-# RABBIT_HOST=10.238.153.51
-RABBIT_HOST=10.0.0.10
-#MYSQL_HOST=10.238.153.51
+
+# if need to use external MQ service
+#RABBIT_HOST=<IP>
+
+# if need to use external mysql service
+#MYSQL_HOST=<IP>
 
 # If the ``*_PASSWORD`` variables are not set here you will be prompted to enter
 # values for them by ``stack.sh``and they will be added to ``local.conf``.
@@ -41,7 +42,7 @@ ENABLED_SERVICES=key,mysql,n-api,n-cpu,n-cond,n-sch,n-cauth,n-api-meta
 enable_service placement-api,placement-client
 enable_service g-api,g-reg
 enable_service q-svc,q-dhcp,q-meta,q-agt,q-l3
-#enable_service c-api,c-sch,c-vol
+enable_service c-api,c-sch,c-vol
 # ``HOST_IP`` and ``HOST_IPV6`` should be set manually for best results if
 # the NIC configuration of the host is unusual, i.e. ``eth1`` has the default
 # route but ``eth0`` is the public interface.  They are auto-detected in
