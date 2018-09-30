@@ -922,7 +922,11 @@ function _neutron_setup_rootwrap {
     echo "$STACK_USER ALL=(root) NOPASSWD: $ROOTWRAP_DAEMON_SUDOER_CMD" >>$TEMPFILE
     chmod 0440 $TEMPFILE
     sudo chown root:root $TEMPFILE
-    sudo mv $TEMPFILE /etc/sudoers.d/neutron-rootwrap
+    if is_clear; then
+        sudo mv $TEMPFILE /usr/share/defaults/sudo/sudoers.d/neutron-rootwrap
+    else
+        sudo mv $TEMPFILE /etc/sudoers.d/neutron-rootwrap
+    fi
 
     # Update the root_helper
     iniset $NEUTRON_CONF agent root_helper "$Q_RR_COMMAND"

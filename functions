@@ -786,7 +786,11 @@ function set_systemd_override {
     local key="$1"
     local value="$2"
 
-    local sysconf="/etc/systemd/system.conf"
+    if is_clear; then
+        local sysconf="/usr/lib/systemd/system.conf.d/50-nfiles.conf"
+    else
+        local sysconf="/etc/systemd/system.conf"
+    fi
     iniset -sudo "${sysconf}" "Manager" "$key" "$value"
     echo "Set systemd system override for ${key}=${value}"
 
