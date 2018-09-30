@@ -352,11 +352,12 @@ function GetOSVersion {
         os_RELEASE="clr"
         os_CODENAME="clr"
         os_VENDOR="ClearLinux"
-        os_PACKAGE="rpm"
     fi
 
     if [[ $os_VENDOR =~ (Debian|Ubuntu|LinuxMint) ]]; then
         os_PACKAGE="deb"
+    elif [[ $os_VENDOR =~ ClearLinux ]]; then
+        os_PACKAGE="swupd"
     else
         os_PACKAGE="rpm"
     fi
@@ -1293,7 +1294,7 @@ function real_install_package {
     elif is_suse; then
         zypper_install "$@"
     elif is_clear; then
-        yum_install "$@"
+        echo 'Suppose to install package:' "$@"
     else
 	exit_distro_not_supported "installing packages"
     fi
@@ -1323,6 +1324,8 @@ function is_package_installed {
         dpkg -s "$@" > /dev/null 2> /dev/null
     elif [[ "$os_PACKAGE" = "rpm" ]]; then
         rpm --quiet -q "$@"
+    elif [[ "$os_PACKAGE" = "swupd" ]]; then
+        echo 'Checking the installed package:' "$@"
     else
         exit_distro_not_supported "finding if a package is installed"
     fi
@@ -1333,10 +1336,12 @@ function is_package_installed {
 function uninstall_package {
     if is_ubuntu; then
         apt_get purge "$@"
-    elif is_fedora || is_clear; then
+    elif is_fedora; then
         sudo ${YUM:-yum} remove -y "$@" ||:
     elif is_suse; then
         sudo zypper remove -y "$@" ||:
+    elif is_clear; then
+        echo 'Suppose to remove package:' "$@"
     else
         exit_distro_not_supported "uninstalling packages"
     fi
